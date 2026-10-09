@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comic Craft</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f3eaff;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: auto;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px #0002;
+        }
+
+        h1 {
+            text-align: center;
+            color: #6a1b9a;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #666;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input, select, button {
+            padding: 11px;
+            border: 1px solid #ddd;
+            border-radius: 7px;
+            font-size: 15px;
+        }
+
+        input, select {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        button {
+            background: #7e35b1;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #572080;
+        }
+
+        #comic {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .panel {
+            min-height: 220px;
+            padding: 15px;
+            border: 3px solid #222;
+            background: #fff8dc;
+            position: relative;
+            text-align: center;
+            overflow-wrap: anywhere;
+        }
+
+        .scene {
+            font-size: 45px;
+            margin: 15px 0;
+        }
+
+        .bubble {
+            display: inline-block;
+            background: white;
+            border: 2px solid #222;
+            border-radius: 18px;
+            padding: 10px;
+            max-width: 100%;
+            margin-top: 5px;
+        }
+
+        .panel-number {
+            position: absolute;
+            top: 5px;
+            left: 7px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .delete-btn {
+            background: #d64545;
+            margin-top: 12px;
+            font-size: 12px;
+            padding: 7px;
+        }
+
+        footer {
+            text-align: center;
+            color: #777;
+            margin-top: 20px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 550px) {
+            #comic {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h1>🎨 Comic Craft</h1>
+    <p class="subtitle">
+        Create your own funny and exciting comics!
+    </p>
+
+    <div class="toolbar">
+        <input id="character"
+               type="text"
+               placeholder="Character name"
+               value="Super Hero">
+
+        <select id="emoji">
+            <option value="🦸">Super Hero</option>
+            <option value="👧">Girl</option>
+            <option value="👦">Boy</option>
+            <option value="🐱">Cat</option>
+            <option value="🐶">Dog</option>
+            <option value="👽">Alien</option>
+            <option value="🤖">Robot</option>
+        </select>
+
+        <input id="dialogue"
+               type="text"
+               placeholder="Enter speech bubble"
+               value="Hello, everyone!">
+
+        <select id="background">
+            <option value="#fff8dc">Cream</option>
+            <option value="#e1f5fe">Sky Blue</option>
+            <option value="#fce4ec">Pink</option>
+            <option value="#e8f5e9">Light Green</option>
+            <option value="#f3e5f5">Lavender</option>
+        </select>
+
+        <button onclick="addPanel()">+ Add Panel</button>
+    </div>
+
+    <div id="comic">
+        <div class="panel">
+            <span class="panel-number">Panel 1</span>
+            <h3>My First Comic</h3>
+            <div class="scene">🦸</div>
+            <div class="bubble">Hello, everyone!</div>
+        </div>
+    </div>
+
+    <div class="actions">
+        <button onclick="downloadComic()">Download Comic</button>
+        <button onclick="clearComic()">Clear Comic</button>
+    </div>
+
+    <footer>
+        Made with ❤️ using Comic Craft
+    </footer>
+</div>
+
+<script>
+    let panelCount = 1;
+
+    function addPanel() {
+        const character =
+            document.getElementById("character").value.trim()
+            || "My Character";
+
+        const emoji =
+            document.getElementById("emoji").value;
+
+        const dialogue =
+            document.getElementById("dialogue").value.trim()
+            || "Hi!";
+
+        const background =
+            document.getElementById("background").value;
+
+        const comic = document.getElementById("comic");
+
+        panelCount++;
+
+        const panel = document.createElement("div");
+        panel.className = "panel";
+        panel.style.backgroundColor = background;
+
+        const number = document.createElement("span");
+        number.className = "panel-number";
+        number.textContent = "Panel " + panelCount;
+
+        const heading = document.createElement("h3");
+        heading.textContent = character;
+
+        const scene = document.createElement("div");
+        scene.className = "scene";
+        scene.textContent = emoji;
+
+        const bubble = document.createElement("div");
+        bubble.className = "bubble";
+        bubble.textContent = dialogue;
+
+        const deleteButton = document.createElement("button");
+        deleteButton.className = "delete-btn";
+        deleteButton.textContent = "Delete Panel";
+
+        deleteButton.onclick = function () {
+            panel.remove();
+            renumberPanels();
+        };
+
+        panel.append(number, heading, scene, bubble, deleteButton);
+        comic.appendChild(panel);
+    }
+
+    function renumberPanels() {
+        const panels = document.querySelectorAll("#comic .panel");
+        panelCount = panels.length;
+
+        panels.forEach(function(panel, index) {
+            const number = panel.querySelector(".panel-number");
+            number.textContent = "Panel " + (index + 1);
+        });
+    }
+
+    function clearComic() {
+        if (confirm("Do you want to clear your comic?")) {
+            document.getElementById("comic").replaceChildren();
+            panelCount = 0;
+        }
+    }
+
+    function downloadComic() {
+        const panels = document.querySelectorAll("#comic .panel");
+
+        if (panels.length === 0) {
+            alert("Please add at least one comic panel.");
+            return;
+        }
+
+        const panelData = Array.from(panels).map(function(panel) {
+            return {
+                number: panel.querySelector(".panel-number").textContent,
+                character: panel.querySelector("h3").textContent,
+                emoji: panel.querySelector(".scene").textContent,
+                dialogue: panel.querySelector(".bubble").textContent,
+                background: getComputedStyle(panel).backgroundColor
+            };
+        });
+
+        const safe = function(value) {
+            return String(value).replace(/[&<>"']/g, function(char) {
+                return {
+                    "&": "&amp;",
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#39;"
+                }[char];
+            });
+        };
+
+        const svgPanels = panelData.map(function(panel, index) {
+            const x = (index % 2) * 400;
+            const y = Math.floor(index / 2) * 260;
+
+            return `
+                <g transform="translate(${x},${y})">
+                    <rect width="380" height="240" rx="5"
+                        fill="${panel.background}" stroke="#222" stroke-width="4"/>
+                    <text x="12" y="24" font-size="13">${safe(panel.number)}</text>
+                    <text x="190" y="55" text-anchor="middle"
+                        font-size="21" font-weight="bold">${safe(panel.character)}</text>
+                    <text x="190" y="115" text-anchor="middle"
+                        font-size="48">${safe(panel.emoji)}</text>
+                    <rect x="25" y="145" width="330" height="65" rx="18"
+                        fill="white" stroke="#222" stroke-width="2"/>
+                    <foreignObject x="35" y="150" width="310" height="55">
+                        <div xmlns="http://www.w3.org/1999/xhtml"
+                            style="font:16px Arial;text-align:center;
+                            overflow-wrap:anywhere;padding:5px;">
+                            ${safe(panel.dialogue)}
+                        </div>
+                    </foreignObject>
+                </g>`;
+        }).join("");
+
+        const rows = Math.ceil(panelData.length / 2);
+        const svg = `
+            <svg xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                width="800" height="${rows * 260}">
+                <rect width="100%" height="100%" fill="white"/>
+                ${svgPanels}
+            </svg>`;
+
+        const blob = new Blob([svg], {
+            type: "image/svg+xml;charset=utf-8"
+        });
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "comic-craft.svg";
+        link.click();
+
+        setTimeout(function() {
+            URL.revokeObjectURL(url);
+        }, 1000);
+    }
+</script>
+</body>
+</html> 
